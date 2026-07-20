@@ -1,1 +1,1 @@
-print("Kittisak")
+Name = "บังกาย ระเบิดตด"
