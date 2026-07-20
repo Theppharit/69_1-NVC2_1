@@ -1,1 +1,1 @@
-print("Wararurtai") 
+print("Wararurtai")   
