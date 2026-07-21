@@ -1,8 +1,9 @@
-name = "พงษ์พิพัฒน์ จุฬารมย์"
 
-age = 18
+score = 75
 
-if age >= 18:
-    print(name + " เป็นผู้ใหญ่")
+if score >= 80:
+    print("เกรด A")
+elif score >= 70:
+    print("เกรด B")
 else:
-    print(name + " เป็นเด็ก")
+    print("เกรด C")
