@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENTRY — แพลตฟอร์มบ้านอัจฉริยะ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0A0E14;
+  --panel:#11171F;
+  --panel-raised:#182029;
+  --panel-hover:#1D2733;
+  --border:#242F3B;
+  --border-soft:#1A222C;
+  --text:#E9EEF3;
+  --text-dim:#8B98A7;
+  --text-faint:#5B6672;
+  --teal:#3ED6C0;
+  --teal-dim:rgba(62,214,192,0.12);
+  --amber:#F2A93B;
+  --amber-dim:rgba(242,169,59,0.12);
+  --red:#FF5D5D;
+  --red-dim:rgba(255,93,93,0.12);
+  --font-display:'Prompt',sans-serif;
+  --font-body:'Sarabun',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--void);
+  color:var(--text);
+  font-family:var(--font-body);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--teal-dim);color:var(--teal);}
+ 
+/* ---------- layout ---------- */
+.app{display:flex;min-height:100vh;}
+ 
+.sidebar{
+  width:230px;flex-shrink:0;
+  background:var(--panel);
+  border-right:1px solid var(--border-soft);
+  display:flex;flex-direction:column;
+  padding:22px 14px;
+  position:sticky;top:0;height:100vh;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px 26px 10px;}
+.brand-mark{
+  width:34px;height:34px;border-radius:9px;
+  background:radial-gradient(circle at 30% 30%, var(--teal), #1a5c53);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 18px rgba(62,214,192,0.35);
+  flex-shrink:0;
+}
+.brand-mark svg{width:18px;height:18px;}
+.brand-text{font-family:var(--font-display);font-weight:600;font-size:16.5px;letter-spacing:0.5px;}
+.brand-sub{font-family:var(--font-mono);font-size:9.5px;color:var(--text-faint);letter-spacing:1.5px;margin-top:1px;}
+ 
+.nav{display:flex;flex-direction:column;gap:2px;margin-top:6px;flex:1;}
+.nav-item{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 12px;border-radius:9px;
+  color:var(--text-dim);font-size:14.5px;font-weight:500;
+  cursor:pointer;border:1px solid transparent;
+  transition:background .15s, color .15s;
+  user-select:none;
+}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.85;}
+.nav-item:hover{background:var(--panel-hover);color:var(--text);}
+.nav-item.active{
+  background:var(--teal-dim);
+  color:var(--teal);
+  border-color:rgba(62,214,192,0.25);
+}
+.nav-item.active svg{opacity:1;}
+.nav-num{
+  font-family:var(--font-mono);font-size:10px;color:var(--text-faint);
+  margin-left:auto;
+}
+.nav-item.active .nav-num{color:var(--teal);opacity:.7;}
+ 
+.sidebar-foot{
+  border-top:1px solid var(--border-soft);
+  padding-top:14px;margin-top:10px;
+  display:flex;align-items:center;gap:10px;
+}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--panel-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);}
+.sidebar-foot-text{font-size:12.5px;color:var(--text-dim);line-height:1.3;}
+.sidebar-foot-text b{color:var(--text);font-weight:500;display:block;font-size:13px;}
+ 
+/* ---------- main ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 32px;border-bottom:1px solid var(--border-soft);
+  position:sticky;top:0;background:rgba(10,14,20,0.85);backdrop-filter:blur(10px);z-index:10;
+}
+.topbar-title{font-family:var(--font-display);font-size:22px;font-weight:600;}
+.topbar-sub{font-size:13px;color:var(--text-dim);margin-top:3px;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.clock{font-family:var(--font-mono);font-size:13px;color:var(--text-dim);text-align:right;}
+.clock b{color:var(--text);font-size:15px;display:block;font-weight:500;}
+ 
+.pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:100px;font-size:12.5px;font-weight:500;
+  font-family:var(--font-body);
+}
+.pill-dot{width:6px;height:6px;border-radius:50%;}
+.pill-teal{background:var(--teal-dim);color:var(--teal);}
+.pill-teal .pill-dot{background:var(--teal);box-shadow:0 0 6px var(--teal);animation:pulse-dot 2s infinite;}
+.pill-amber{background:var(--amber-dim);color:var(--amber);}
+.pill-amber .pill-dot{background:var(--amber);}
+.pill-red{background:var(--red-dim);color:var(--red);}
+.pill-red .pill-dot{background:var(--red);box-shadow:0 0 6px var(--red);animation:pulse-dot 1.2s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.35;}}
+ 
+.view{display:none;padding:28px 32px 60px 32px;animation:fadein .25s ease;}
+.view.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+ 
+.grid{display:grid;gap:16px;}
+.grid-2{grid-template-columns:1.3fr 1fr;}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+ 
+.card{
+  background:var(--panel);border:1px solid var(--border-soft);
+  border-radius:14px;padding:20px;
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-title{font-family:var(--font-display);font-size:14.5px;font-weight:600;letter-spacing:.2px;}
+.card-title-sub{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);margin-top:2px;letter-spacing:.5px;}
+.link-btn{font-size:12.5px;color:var(--teal);cursor:pointer;font-weight:500;}
+.link-btn:hover{text-decoration:underline;}
+ 
+/* ---------- dashboard: status hero ---------- */
+.status-hero{
+  background:linear-gradient(135deg, var(--panel) 0%, var(--panel-raised) 100%);
+  border:1px solid var(--border-soft);border-radius:14px;padding:24px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.status-block{display:flex;align-items:center;gap:16px;}
+.status-ring{
+  width:64px;height:64px;border-radius:50%;
+  border:2px solid var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;flex-shrink:0;
+  box-shadow:0 0 0 6px var(--teal-dim);
+}
+.status-ring svg{width:26px;height:26px;color:var(--teal);}
+.status-label{font-size:12px;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:.5px;}
+.status-value{font-family:var(--font-display);font-size:20px;font-weight:600;margin-top:2px;}
+.status-actions{display:flex;gap:10px;flex-wrap:wrap;}
+ 
+.btn{
+  font-family:var(--font-body);font-weight:500;font-size:13.5px;
+  padding:11px 18px;border-radius:10px;border:1px solid var(--border);
+  background:var(--panel-raised);color:var(--text);cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:.15s;
+}
+.btn svg{width:15px;height:15px;}
+.btn:hover{background:var(--panel-hover);border-color:var(--text-faint);}
+.btn-primary{background:var(--teal);color:#06231F;border-color:var(--teal);font-weight:600;}
+.btn-primary:hover{background:#5AE0CC;}
+.btn-danger{background:var(--red-dim);color:var(--red);border-color:rgba(255,93,93,.3);}
+.btn-danger:hover{background:rgba(255,93,93,.2);}
+.btn.active-toggle{background:var(--teal);color:#06231F;border-color:var(--teal);}
+ 
+/* camera / radar */
+.camera-panel{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/10;background:#060A0F;border:1px solid var(--border-soft);}
+.camera-grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(62,214,192,.06) 1px, transparent 1px),linear-gradient(90deg, rgba(62,214,192,.06) 1px, transparent 1px);background-size:24px 24px;}
+.radar-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.radar-ring{position:absolute;border:1px solid rgba(62,214,192,.18);border-radius:50%;}
+.radar-sweep{
+  position:absolute;width:50%;height:50%;top:0;left:50%;
+  transform-origin:0% 100%;
+  background:conic-gradient(from 0deg, rgba(62,214,192,.35), transparent 35%);
+  animation:sweep 4s linear infinite;
+}
+@keyframes sweep{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.blip{position:absolute;width:7px;height:7px;background:var(--amber);border-radius:50%;box-shadow:0 0 8px var(--amber);animation:blip-pulse 2.4s ease-in-out infinite;}
+@keyframes blip-pulse{0%,100%{opacity:.9;transform:scale(1);}50%{opacity:.3;transform:scale(1.6);}}
+.camera-overlay-top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;z-index:3;}
+.camera-tag{font-family:var(--font-mono);font-size:10.5px;background:rgba(0,0,0,.5);padding:5px 9px;border-radius:6px;letter-spacing:.5px;border:1px solid rgba(255,255,255,.08);}
+.camera-tag.live{color:var(--red);border-color:rgba(255,93,93,.3);display:flex;align-items:center;gap:5px;}
+.camera-tag.live::before{content:'';width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse-dot 1s infinite;}
+.camera-overlay-bottom{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-end;z-index:3;}
+ 
+.detect-badge{font-family:var(--font-mono);font-size:11px;background:rgba(6,10,15,.75);border:1px solid var(--teal);color:var(--teal);padding:6px 10px;border-radius:7px;}
+ 
+/* activity list */
+.activity-list{display:flex;flex-direction:column;}
+.activity-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-soft);}
+.activity-row:last-child{border-bottom:none;}
+.activity-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.activity-icon svg{width:16px;height:16px;}
+.activity-text{flex:1;min-width:0;}
+.activity-title{font-size:13.5px;font-weight:500;}
+.activity-meta{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);margin-top:1px;}
+.activity-time{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);flex-shrink:0;}
+ 
+/* sparkline heartbeat */
+.pulse-strip{height:36px;width:120px;}
+ 
+/* ---------- alerts view ---------- */
+.alert-card{
+  display:flex;gap:14px;padding:16px;border-radius:12px;
+  border:1px solid var(--border-soft);background:var(--panel);
+  margin-bottom:12px;
+}
+.alert-thumb{width:74px;height:56px;border-radius:8px;background:#060A0F;flex-shrink:0;position:relative;overflow:hidden;border:1px solid var(--border);}
+.alert-thumb .camera-grid-lines{background-size:14px 14px;}
+.alert-severity-bar{width:3px;border-radius:3px;flex-shrink:0;}
+.sev-high{background:var(--red);box-shadow:0 0 8px rgba(255,93,93,.5);}
+.sev-med{background:var(--amber);}
+.sev-low{background:var(--text-faint);}
+.alert-body{flex:1;min-width:0;}
+.alert-top{display:flex;justify-content:space-between;gap:10px;}
+.alert-name{font-weight:600;font-size:14px;font-family:var(--font-display);}
+.alert-time{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);white-space:nowrap;}
+.alert-desc{font-size:13px;color:var(--text-dim);margin-top:4px;}
+.alert-tags{display:flex;gap:6px;margin-top:9px;}
+.tag{font-size:10.5px;font-family:var(--font-mono);padding:3px 8px;border-radius:5px;background:var(--panel-raised);color:var(--text-dim);border:1px solid var(--border);}
+ 
+.filter-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.filter-chip{padding:7px 14px;border-radius:100px;font-size:12.5px;border:1px solid var(--border);color:var(--text-dim);cursor:pointer;font-weight:500;}
+.filter-chip.active{background:var(--teal-dim);color:var(--teal);border-color:rgba(62,214,192,.3);}
+ 
+/* ---------- devices view ---------- */
+.floorplan{position:relative;border-radius:12px;background:var(--panel-raised);border:1px solid var(--border-soft);aspect-ratio:4/3;overflow:hidden;}
+.floorplan svg{width:100%;height:100%;}
+.node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+.node-dot{width:11px;height:11px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 5px var(--teal-dim);}
+.node-dot.warn{background:var(--amber);box-shadow:0 0 0 5px var(--amber-dim);}
+.node-label{font-family:var(--font-mono);font-size:9.5px;color:var(--text-dim);margin-top:5px;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:4px;white-space:nowrap;}
+ 
+.device-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border-soft);}
+.device-row:last-child{border-bottom:none;}
+.device-icon{width:38px;height:38px;border-radius:10px;background:var(--panel-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.device-icon svg{width:18px;height:18px;color:var(--text-dim);}
+.device-info{flex:1;min-width:0;}
+.device-name{font-size:13.5px;font-weight:500;}
+.device-meta{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);margin-top:1px;}
+.battery{display:flex;align-items:center;gap:6px;}
+.battery-track{width:44px;height:7px;border-radius:4px;background:var(--panel-raised);border:1px solid var(--border);overflow:hidden;}
+.battery-fill{height:100%;border-radius:4px;background:var(--teal);}
+.battery-pct{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);width:32px;}
+ 
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-soft);}
+.settings-row:last-child{border-bottom:none;}
+.settings-label{font-size:13.5px;font-weight:500;}
+.settings-sub{font-size:11.5px;color:var(--text-faint);margin-top:2px;}
+.toggle{width:42px;height:24px;border-radius:100px;background:var(--panel-raised);border:1px solid var(--border);position:relative;cursor:pointer;flex-shrink:0;transition:.2s;}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--text-faint);top:2px;left:2px;transition:.2s;}
+.toggle.on{background:var(--teal-dim);border-color:rgba(62,214,192,.4);}
+.toggle.on::after{transform:translateX(18px);background:var(--teal);}
+ 
+.slider-row{margin:16px 0;}
+.slider-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;}
+.slider-label b{font-family:var(--font-mono);color:var(--teal);font-weight:500;}
+input[type=range]{width:100%;accent-color:var(--teal);height:4px;}
+ 
+/* ---------- access table ---------- */
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);letter-spacing:.6px;text-transform:uppercase;padding:0 12px 12px 12px;font-weight:500;}
+td{padding:13px 12px;border-top:1px solid var(--border-soft);font-size:13.5px;}
+tr:hover td{background:var(--panel-raised);}
+.face-chip{display:flex;align-items:center;gap:9px;}
+.face-avatar{width:28px;height:28px;border-radius:50%;background:var(--panel-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-mono);color:var(--text-dim);}
+.status-chip{font-size:11.5px;font-family:var(--font-mono);padding:4px 9px;border-radius:6px;}
+.chip-in{background:var(--teal-dim);color:var(--teal);}
+.chip-out{background:var(--panel-raised);color:var(--text-faint);border:1px solid var(--border);}
+ 
+/* video grid */
+.video-thumb{aspect-ratio:16/10;border-radius:10px;background:#060A0F;position:relative;overflow:hidden;border:1px solid var(--border-soft);cursor:pointer;}
+.video-thumb .camera-grid-lines{background-size:16px 16px;}
+.video-thumb:hover{border-color:var(--teal);}
+.video-thumb .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.video-thumb .play svg{width:30px;height:30px;color:rgba(255,255,255,.8);}
+.video-thumb .duration{position:absolute;bottom:8px;right:8px;font-family:var(--font-mono);font-size:10px;background:rgba(0,0,0,.6);padding:3px 7px;border-radius:5px;}
+.video-thumb .tagline{position:absolute;top:8px;left:8px;font-family:var(--font-mono);font-size:10px;background:rgba(0,0,0,.6);padding:3px 7px;border-radius:5px;color:var(--amber);}
+ 
+.storage-bar{height:8px;border-radius:5px;background:var(--panel-raised);border:1px solid var(--border);overflow:hidden;margin-top:10px;}
+.storage-fill{height:100%;background:linear-gradient(90deg, var(--teal), #2AA694);}
+ 
+@media (max-width:900px){
+  .sidebar{position:fixed;left:-250px;z-index:50;transition:.2s;}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+  .topbar{padding:16px 18px;}
+  .view{padding:18px 18px 50px 18px;}
+}
+ 
+/* ---------- login screen ---------- */
+#login-screen{
+  min-height:100vh;display:flex;
+  background:var(--void);
+  position:relative;overflow:hidden;
+}
+.login-visual{
+  flex:1.1;position:relative;
+  background:#060A0F;
+  border-right:1px solid var(--border-soft);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.login-visual .camera-grid-lines{background-size:34px 34px;}
+.login-visual .radar-ring{border-color:rgba(62,214,192,.14);}
+.login-visual .radar-sweep{background:conic-gradient(from 0deg, rgba(62,214,192,.28), transparent 35%);}
+.login-visual .blip{width:8px;height:8px;}
+.login-visual-copy{position:relative;z-index:3;text-align:center;padding:0 40px;}
+.login-visual-copy .brand-mark{margin:0 auto 22px auto;width:52px;height:52px;border-radius:14px;}
+.login-visual-copy .brand-mark svg{width:26px;height:26px;}
+.login-visual-title{font-family:var(--font-display);font-size:26px;font-weight:600;letter-spacing:.3px;margin-bottom:10px;}
+.login-visual-sub{font-size:14px;color:var(--text-dim);max-width:340px;margin:0 auto;line-height:1.6;}
+.login-visual-stats{display:flex;gap:26px;justify-content:center;margin-top:34px;}
+.login-stat b{display:block;font-family:var(--font-mono);font-size:19px;color:var(--teal);font-weight:600;}
+.login-stat span{font-size:11px;color:var(--text-faint);font-family:var(--font-mono);letter-spacing:.5px;}
+.login-corner-tag{position:absolute;top:24px;left:28px;z-index:3;}
+ 
+.login-form-side{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:40px;
+}
+.login-box{width:100%;max-width:360px;}
+.login-box .brand{padding:0 0 34px 0;}
+.login-heading{font-family:var(--font-display);font-size:23px;font-weight:600;margin-bottom:6px;}
+.login-heading-sub{font-size:13.5px;color:var(--text-dim);margin-bottom:30px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:7px;font-weight:500;}
+.field-input-wrap{position:relative;}
+.field-input-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-faint);}
+.field input{
+  width:100%;padding:12px 14px 12px 40px;border-radius:10px;
+  background:var(--panel-raised);border:1px solid var(--border);
+  color:var(--text);font-family:var(--font-body);font-size:14px;
+  outline:none;transition:.15s;
+}
+.field input::placeholder{color:var(--text-faint);}
+.field input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim);}
+.field-toggle-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text-faint);}
+.field-toggle-eye svg{width:16px;height:16px;}
+ 
+.login-row-between{display:flex;align-items:center;justify-content:space-between;margin:2px 0 24px 0;}
+.remember{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-dim);cursor:pointer;user-select:none;}
+.checkbox-mini{width:16px;height:16px;border-radius:5px;border:1px solid var(--border);background:var(--panel-raised);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.checkbox-mini.on{background:var(--teal);border-color:var(--teal);}
+.checkbox-mini svg{width:11px;height:11px;color:#06231F;display:none;}
+.checkbox-mini.on svg{display:block;}
+.forgot-link{font-size:12.5px;color:var(--teal);cursor:pointer;}
+.forgot-link:hover{text-decoration:underline;}
+ 
+.login-submit{width:100%;justify-content:center;padding:13px;font-size:14.5px;}
+.login-divider{display:flex;align-items:center;gap:12px;margin:24px 0;}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border-soft);}
+.login-divider span{font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);}
+ 
+.login-2fa-note{
+  display:flex;align-items:center;gap:9px;margin-top:22px;
+  padding:11px 13px;border-radius:10px;background:var(--teal-dim);border:1px solid rgba(62,214,192,.2);
+}
+.login-2fa-note svg{width:15px;height:15px;color:var(--teal);flex-shrink:0;}
+.login-2fa-note span{font-size:12px;color:var(--text-dim);line-height:1.4;}
+ 
+.login-error{
+  display:none;align-items:center;gap:8px;padding:10px 13px;border-radius:9px;
+  background:var(--red-dim);border:1px solid rgba(255,93,93,.25);color:var(--red);
+  font-size:12.5px;margin-bottom:16px;
+}
+.login-error svg{width:14px;height:14px;flex-shrink:0;}
+ 
+.hidden{display:none !important;}
+ 
+@media (max-width:820px){
+  #login-screen{flex-direction:column;}
+  .login-visual{min-height:220px;flex:none;border-right:none;border-bottom:1px solid var(--border-soft);}
+  .login-visual-title{font-size:20px;}
+  .login-visual-stats{display:none;}
+}
+</style>
+</head>
+<body>
+ 
+<div id="login-screen">
+  <div class="login-visual">
+    <div class="camera-grid-lines"></div>
+    <div class="radar-wrap">
+      <div class="radar-ring" style="width:70%;height:70%;"></div>
+      <div class="radar-ring" style="width:105%;height:105%;"></div>
+      <div class="radar-ring" style="width:38%;height:38%;"></div>
+      <div class="radar-sweep"></div>
+      <div class="blip" style="top:32%;left:60%;"></div>
+      <div class="blip" style="top:64%;left:38%;animation-delay:1.2s;"></div>
+    </div>
+    <div class="login-corner-tag"><span class="camera-tag live">LIVE</span></div>
+    <div class="login-visual-copy">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#06231F" stroke-width="2.2"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/></svg></div>
+      <div class="login-visual-title">เฝ้าบ้านของคุณตลอด 24 ชั่วโมง</div>
+      <div class="login-visual-sub">ล็อก/ปลดล็อกประตู ดูกล้อง AI CCTV แบบเรียลไทม์ และรับแจ้งเตือนทันทีเมื่อมีความผิดปกติ</div>
+      <div class="login-visual-stats">
+        <div class="login-stat"><b>6</b><span>เซนเซอร์ออนไลน์</span></div>
+        <div class="login-stat"><b>99.9%</b><span>อัปไทม์ระบบ</span></div>
+        <div class="login-stat"><b>24/7</b><span>AI เฝ้าระวัง</span></div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="login-form-side">
+    <div class="login-box">
+      <div class="brand">
+        <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#06231F" stroke-width="2.4"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/></svg></div>
+        <div><div class="brand-text">SENTRY</div><div class="brand-sub">HOME GUARDING</div></div>
+      </div>
+ 
+      <div class="login-heading">เข้าสู่ระบบ</div>
+      <div class="login-heading-sub">กรอกข้อมูลบัญชีเพื่อเข้าถึงระบบเฝ้าระวังบ้านของคุณ</div>
+ 
+      <div class="login-error" id="login-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span>อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</span>
+      </div>
+ 
+      <div id="login-form">
+        <div class="field">
+          <label for="login-email">อีเมล หรือ เบอร์โทรศัพท์</label>
+          <div class="field-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6.5 8 6 8-6"/></svg>
+            <input type="text" id="login-email" placeholder="you@example.com" autocomplete="username" value="user@sentry-home.co">
+          </div>
+        </div>
+        <div class="field">
+          <label for="login-password">รหัสผ่าน</label>
+          <div class="field-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input type="password" id="login-password" placeholder="••••••••••" autocomplete="current-password" value="sentryhome2026">
+            <span class="field-toggle-eye" id="toggle-eye">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+          </div>
+        </div>
+ 
+        <div class="login-row-between">
+          <div class="remember" id="remember-me">
+            <div class="checkbox-mini on" id="remember-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div>
+            จดจำฉันไว้ในเครื่องนี้
+          </div>
+          <span class="forgot-link">ลืมรหัสผ่าน?</span>
+        </div>
+ 
+        <button type="button" id="login-submit-btn" class="btn btn-primary login-submit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+          เข้าสู่ระบบ
+        </button>
+      </div>
+ 
+      <div class="login-2fa-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <span>บัญชีนี้เปิดใช้งานยืนยันตัวตนสองชั้น (2FA) — ระบบจะส่งรหัสยืนยันไปยังแอปของคุณหลังเข้าสู่ระบบ</span>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<div class="app hidden" id="app-root">
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#06231F" stroke-width="2.4"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z"/></svg></div>
+      <div><div class="brand-text">SENTRY</div><div class="brand-sub">HOME GUARDING</div></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        ภาพรวมระบบ <span class="nav-num">01</span>
+      </div>
+      <div class="nav-item" data-view="alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.3 3.9 2.7 17a1.8 1.8 0 0 0 1.5 2.7h15.6a1.8 1.8 0 0 0 1.5-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 16.5h.01"/></svg>
+        แจ้งเตือน &amp; ตอบโต้ <span class="nav-num">02</span>
+      </div>
+      <div class="nav-item" data-view="devices">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        อุปกรณ์ &amp; เซนเซอร์ <span class="nav-num">03</span>
+      </div>
+      <div class="nav-item" data-view="access">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        สมาชิก &amp; การเข้า-ออก <span class="nav-num">04</span>
+      </div>
+      <div class="nav-item" data-view="cloud">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        บันทึกย้อนหลัง &amp; คลาวด์ <span class="nav-num">05</span>
+      </div>
+      <div class="nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+        ตั้งค่าระบบ <span class="nav-num">06</span>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="avatar">น</div>
+      <div class="sidebar-foot-text"><b>คุณนภดล</b>ผู้ดูแลระบบหลัก</div>
+    </div>
+  </aside>
+ 
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="page-title">ภาพรวมระบบ</div>
+        <div class="topbar-sub" id="page-sub">บ้านเลขที่ 24/8 — สถานะทั้งหมดของบ้านในที่เดียว</div>
+      </div>
+      <div class="topbar-right">
+        <span class="pill pill-teal"><span class="pill-dot"></span>ระบบทำงานปกติ</span>
+        <div class="clock"><b id="clock-time">--:--:--</b><span id="clock-date">-</span></div>
+      </div>
+    </div>
+ 
+    <!-- ================= 01 DASHBOARD ================= -->
+    <section class="view active" id="view-dashboard">
+ 
+      <div class="status-hero" style="margin-bottom:16px;">
+        <div class="status-block">
+          <div class="status-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+          <div>
+            <div class="status-label">สถานะประตู</div>
+            <div class="status-value" id="lock-status">ล็อกอยู่</div>
+          </div>
+        </div>
+        <div class="status-block">
+          <div class="status-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M5.6 18.4l2.1-2.1M12 18a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/></svg></div>
+          <div>
+            <div class="status-label">โหมดการทำงาน</div>
+            <div class="status-value" id="mode-status">Active Guarding</div>
+          </div>
+        </div>
+        <div class="status-actions">
+          <button class="btn btn-primary" id="lock-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            ปลดล็อกประตู
+          </button>
+          <button class="btn btn-danger" id="siren-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v4l-2 4h18l-2-4V7a5 5 0 0 0-5-5Z"/><path d="M9 19a3 3 0 0 0 6 0"/></svg>
+            เปิดเสียงไซเรน
+          </button>
+        </div>
+      </div>
+ 
+      <div class="grid grid-2" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">กล้อง AI CCTV — หน้าประตูบ้าน</div><div class="card-title-sub">SENSITIVITY 72% · TRIGGER-BASED</div></div>
+            <span class="detect-badge">AI SCANNING</span>
+          </div>
+          <div class="camera-panel">
+            <div class="camera-grid-lines"></div>
+            <div class="radar-wrap">
+              <div class="radar-ring" style="width:60%;height:60%;"></div>
+              <div class="radar-ring" style="width:90%;height:90%;"></div>
+              <div class="radar-ring" style="width:30%;height:30%;"></div>
+              <div class="radar-sweep"></div>
+              <div class="blip" style="top:38%;left:62%;"></div>
+              <div class="blip" style="top:58%;left:40%;animation-delay:1.1s;"></div>
+            </div>
+            <div class="camera-overlay-top">
+              <span class="camera-tag live">LIVE</span>
+              <span class="camera-tag">CAM-01 · FRONT DOOR</span>
+            </div>
+            <div class="camera-overlay-bottom">
+              <span class="camera-tag">ไม่พบใบหน้าที่ไม่รู้จัก</span>
+              <span class="camera-tag" id="cam-clock">00:00:00</span>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">สถานะการตรวจจับของ AI</div><div class="card-title-sub">HUMAN / FACE DETECTION</div></div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-row">
+              <div class="activity-icon" style="background:var(--teal-dim);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg></div>
+              <div class="activity-text"><div class="activity-title">ตรวจพบใบหน้า — สมาชิกในบ้าน</div><div class="activity-meta">จับคู่กับฐานข้อมูล 98.4%</div></div>
+              <div class="activity-time">2 นาทีที่แล้ว</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-icon" style="background:var(--panel-raised);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div>
+              <div class="activity-text"><div class="activity-title">ตรวจจับโครงร่างมนุษย์บริเวณรั้ว</div><div class="activity-meta">กล้อง CAM-02 · ริมรั้วหลังบ้าน</div></div>
+              <div class="activity-time">27 นาทีที่แล้ว</div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-icon" style="background:var(--panel-raised);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><path d="M5 3v18M19 3v18M3 12h18"/></svg></div>
+              <div class="activity-text"><div class="activity-title">Sleep Mode เปิดใช้งานอัตโนมัติ</div><div class="activity-meta">ไม่มีความเคลื่อนไหว 30 นาที</div></div>
+              <div class="activity-time">1 ชม. ที่แล้ว</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;">
+            <span class="card-title-sub">ความถี่การตรวจจับ 24 ชม.</span>
+            <svg class="pulse-strip" viewBox="0 0 120 36"><polyline points="0,26 10,26 16,10 22,28 30,26 40,26 46,6 52,30 58,26 70,26 76,16 82,26 92,26 98,8 104,26 120,26" fill="none" stroke="#3ED6C0" stroke-width="1.6"/></svg>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-head">
+          <div><div class="card-title">สรุปกิจกรรมล่าสุด</div><div class="card-title-sub">RECENT ACTIVITY LOG</div></div>
+          <span class="link-btn" onclick="switchView('access')">ดูทั้งหมด →</span>
+        </div>
+        <div class="activity-list">
+          <div class="activity-row">
+            <div class="activity-icon" style="background:var(--teal-dim);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M5 10V7a5 5 0 0 1 10 0v3M4 10h12v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9Z"/></svg></div>
+            <div class="activity-text"><div class="activity-title">คุณแม่ปลดล็อกประตูหน้าบ้าน</div><div class="activity-meta">ยืนยันด้วยใบหน้า</div></div>
+            <div class="activity-time">08:12</div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-icon" style="background:var(--panel-raised);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><path d="M5 10V7a5 5 0 0 1 10 0v3M4 10h12v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9Z"/></svg></div>
+            <div class="activity-text"><div class="activity-title">ระบบล็อกประตูอัตโนมัติ</div><div class="activity-meta">ครบกำหนดเวลา 15 นาที</div></div>
+            <div class="activity-time">08:27</div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-icon" style="background:var(--panel-raised);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+            <div class="activity-text"><div class="activity-title">พนักงานส่งพัสดุผ่านหน้าบ้าน</div><div class="activity-meta">ไม่เข้าเขตพื้นที่ควบคุม</div></div>
+            <div class="activity-time">13:45</div>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ================= 02 ALERTS ================= -->
+    <section class="view" id="view-alerts">
+      <div class="grid grid-2" style="align-items:start;">
+        <div>
+          <div class="filter-row">
+            <div class="filter-chip active">ทั้งหมด</div>
+            <div class="filter-chip">ภัยคุกคาม (AI)</div>
+            <div class="filter-chip">คำเตือนทั่วไป</div>
+            <div class="filter-chip">วันนี้</div>
+          </div>
+ 
+          <div class="alert-card">
+            <div class="alert-severity-bar sev-high"></div>
+            <div class="alert-thumb"><div class="camera-grid-lines"></div></div>
+            <div class="alert-body">
+              <div class="alert-top"><span class="alert-name">ตรวจพบผู้บุกรุกไม่ทราบใบหน้า</span><span class="alert-time">วันนี้ 02:14 น.</span></div>
+              <div class="alert-desc">AI CCTV ตรวจพบบุคคลปีนรั้วหลังบ้าน ไม่พบในฐานข้อมูลใบหน้า</div>
+              <div class="alert-tags"><span class="tag">CAM-02</span><span class="tag">AI THREAT</span><span class="tag">มีคลิปวิดีโอ</span></div>
+            </div>
+          </div>
+ 
+          <div class="alert-card">
+            <div class="alert-severity-bar sev-med"></div>
+            <div class="alert-thumb"><div class="camera-grid-lines"></div></div>
+            <div class="alert-body">
+              <div class="alert-top"><span class="alert-name">หน้าต่างห้องครัวถูกเปิดค้าง</span><span class="alert-time">เมื่อวาน 21:50 น.</span></div>
+              <div class="alert-desc">เซนเซอร์ประตู-หน้าต่างแจ้งสถานะเปิดนานเกิน 10 นาทีขณะเปิด Active Guarding</div>
+              <div class="alert-tags"><span class="tag">SENSOR-07</span><span class="tag">คำเตือนทั่วไป</span></div>
+            </div>
+          </div>
+ 
+          <div class="alert-card">
+            <div class="alert-severity-bar sev-low"></div>
+            <div class="alert-thumb"><div class="camera-grid-lines"></div></div>
+            <div class="alert-body">
+              <div class="alert-top"><span class="alert-name">แบตเตอรี่เซนเซอร์ประตูหลังต่ำ</span><span class="alert-time">เมื่อวาน 09:03 น.</span></div>
+              <div class="alert-desc">ระดับแบตเตอรี่เหลือ 14% ควรเปลี่ยนภายใน 7 วัน</div>
+              <div class="alert-tags"><span class="tag">SENSOR-03</span><span class="tag">อุปกรณ์</span></div>
+            </div>
+          </div>
+        </div>
+ 
+        <div>
+          <div class="card">
+            <div class="card-head"><div><div class="card-title">แผงตอบโต้เหตุการณ์เชิงรุก</div><div class="card-title-sub">ACTIVE DEFENSE PANEL</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn btn-danger" id="siren-btn-2" style="justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v4l-2 4h18l-2-4V7a5 5 0 0 0-5-5Z"/></svg>
+                ส่งเสียงไซเรนขับไล่ทันที
+              </button>
+              <button class="btn" style="justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/></svg>
+                โทรฉุกเฉิน — สภ. ใกล้เคียง
+              </button>
+              <div style="border-top:1px solid var(--border-soft);margin:6px 0;"></div>
+              <div class="settings-row" style="padding:8px 0;">
+                <div class="settings-label" style="font-size:12.5px;">แจ้งเตือนผ่าน LINE Notify</div>
+                <div class="toggle on"></div>
+              </div>
+            </div>
+          </div>
+ 
+          <div class="card" style="margin-top:16px;">
+            <div class="card-head"><div><div class="card-title">ประวัติแจ้งเตือนย้อนหลัง</div><div class="card-title-sub">กรองตามวัน / เวลา / ประเภทเซนเซอร์</div></div></div>
+            <div class="activity-list">
+              <div class="activity-row"><div class="activity-icon" style="background:var(--red-dim);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div><div class="activity-text"><div class="activity-title">ภัยคุกคาม — รั้วหลังบ้าน</div><div class="activity-meta">3 ครั้งในสัปดาห์นี้</div></div></div>
+              <div class="activity-row"><div class="activity-icon" style="background:var(--amber-dim);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div><div class="activity-text"><div class="activity-title">คำเตือนทั่วไป — ประตู/หน้าต่าง</div><div class="activity-meta">9 ครั้งในสัปดาห์นี้</div></div></div>
+              <div class="activity-row"><div class="activity-icon" style="background:var(--panel-raised);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div><div class="activity-text"><div class="activity-title">แจ้งเตือนอุปกรณ์</div><div class="activity-meta">2 ครั้งในสัปดาห์นี้</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ================= 03 DEVICES ================= -->
+    <section class="view" id="view-devices">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">ผังตำแหน่งเซนเซอร์ในบ้าน</div><div class="card-title-sub">แตะจุดเพื่อดูสถานะ</div></div></div>
+          <div class="floorplan">
+            <svg viewBox="0 0 300 225"><rect x="10" y="10" width="280" height="205" fill="none" stroke="#242F3B" stroke-width="1.5"/><line x1="150" y1="10" x2="150" y2="140" stroke="#242F3B" stroke-width="1.5"/><line x1="10" y1="140" x2="290" y2="140" stroke="#242F3B" stroke-width="1.5"/><line x1="220" y1="140" x2="220" y2="215" stroke="#242F3B" stroke-width="1.5"/></svg>
+            <div class="node" style="top:12%;left:50%;"><div class="node-dot"></div><div class="node-label">DOOR-01</div></div>
+            <div class="node" style="top:55%;left:8%;"><div class="node-dot warn"></div><div class="node-label">SENSOR-03</div></div>
+            <div class="node" style="top:80%;left:78%;"><div class="node-dot"></div><div class="node-label">WINDOW-07</div></div>
+            <div class="node" style="top:30%;left:85%;"><div class="node-dot"></div><div class="node-label">CAM-01</div></div>
+            <div class="node" style="top:70%;left:35%;"><div class="node-dot"></div><div class="node-label">MOTION-02</div></div>
+          </div>
+        </div>
+ 
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">Smart Sensors — แบตเตอรี่ &amp; สัญญาณ</div></div></div>
+          <div class="device-row">
+            <div class="device-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 10V7a5 5 0 0 1 10 0v3M4 10h12v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9Z"/></svg></div>
+            <div class="device-info"><div class="device-name">DOOR-01 · ประตูหน้าบ้าน</div><div class="device-meta">สัญญาณแรง · ออนไลน์</div></div>
+            <div class="battery"><div class="battery-track"><div class="battery-fill" style="width:88%;"></div></div><div class="battery-pct">88%</div></div>
+          </div>
+          <div class="device-row">
+            <div class="device-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+            <div class="device-info"><div class="device-name">MOTION-02 · ระเบียงหลังบ้าน</div><div class="device-meta">สัญญาณแรง · ออนไลน์</div></div>
+            <div class="battery"><div class="battery-track"><div class="battery-fill" style="width:63%;"></div></div><div class="battery-pct">63%</div></div>
+          </div>
+          <div class="device-row">
+            <div class="device-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+            <div class="device-info"><div class="device-name">SENSOR-03 · ประตูหลัง</div><div class="device-meta">สัญญาณอ่อน · ควรเปลี่ยนแบต</div></div>
+            <div class="battery"><div class="battery-track"><div class="battery-fill" style="width:14%;background:var(--amber);"></div></div><div class="battery-pct">14%</div></div>
+          </div>
+          <div class="device-row">
+            <div class="device-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+            <div class="device-info"><div class="device-name">WINDOW-07 · หน้าต่างครัว</div><div class="device-meta">สัญญาณแรง · ออนไลน์</div></div>
+            <div class="battery"><div class="battery-track"><div class="battery-fill" style="width:76%;"></div></div><div class="battery-pct">76%</div></div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="grid grid-2" style="margin-top:16px;align-items:start;">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">ตั้งค่ากล้อง AI CCTV</div><div class="card-title-sub">CAM-01 · หน้าประตูบ้าน</div></div></div>
+          <div class="slider-row">
+            <div class="slider-label">ความไวในการตรวจจับ (Sensitivity) <b>72%</b></div>
+            <input type="range" min="0" max="100" value="72">
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Trigger-Based Recording</div><div class="settings-sub">บันทึกเฉพาะเมื่อตรวจพบความเคลื่อนไหว</div></div>
+            <div class="toggle on"></div>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Sleep Mode ประหยัดพลังงาน</div><div class="settings-sub">พักการสแกนเมื่อไม่มีคนอยู่บ้าน</div></div>
+            <div class="toggle"></div>
+          </div>
+        </div>
+ 
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">การเชื่อมต่อ Smart Home &amp; IoT อื่นๆ</div></div></div>
+          <div class="device-row">
+            <div class="device-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M2 12h20"/></svg></div>
+            <div class="device-info"><div class="device-name">เซนเซอร์ตรวจจับควัน</div><div class="device-meta">ห้องครัว · ออนไลน์</div></div>
+            <span class="pill pill-teal"><span class="pill-dot"></span>ปกติ</span>
+          </div>
+          <div class="device-row">
+            <div class="device-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M2 12h20"/></svg></div>
+            <div class="device-info"><div class="device-name">เซนเซอร์แก๊สรั่ว</div><div class="device-meta">ห้องครัว · ออนไลน์</div></div>
+            <span class="pill pill-teal"><span class="pill-dot"></span>ปกติ</span>
+          </div>
+          <div style="margin-top:14px;">
+            <button class="btn" style="width:100%;justify-content:center;">+ เพิ่มอุปกรณ์ใหม่</button>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ================= 04 ACCESS ================= -->
+    <section class="view" id="view-access">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">บันทึกการเข้า-ออก</div><div class="card-title-sub">ACCESS LOGS</div></div></div>
+          <table>
+            <thead><tr><th>สมาชิก</th><th>เวลา</th><th>ช่องทาง</th><th>สถานะ</th></tr></thead>
+            <tbody>
+              <tr><td><div class="face-chip"><div class="face-avatar">แม่</div>คุณแม่</div></td><td>08:12</td><td>ยืนยันใบหน้า</td><td><span class="status-chip chip-in">เข้าบ้าน</span></td></tr>
+              <tr><td><div class="face-chip"><div class="face-avatar">พ่อ</div>คุณพ่อ</div></td><td>07:40</td><td>รีโมทแอป</td><td><span class="status-chip chip-out">ออกจากบ้าน</span></td></tr>
+              <tr><td><div class="face-chip"><div class="face-avatar">ย่า</div>คุณยาย</div></td><td>ต.19:20</td><td>คีย์การ์ด</td><td><span class="status-chip chip-in">เข้าบ้าน</span></td></tr>
+              <tr><td><div class="face-chip"><div class="face-avatar">ลูก</div>น้องพลอย</div></td><td>ต.16:05</td><td>ยืนยันใบหน้า</td><td><span class="status-chip chip-in">เข้าบ้าน</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+ 
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">คลังใบหน้าสำหรับ AI</div><div class="card-title-sub">FACE RECOGNITION DATABASE</div></div></div>
+          <div class="device-row"><div class="face-avatar" style="width:38px;height:38px;">แม่</div><div class="device-info"><div class="device-name">คุณแม่ — สมาชิกในบ้าน</div><div class="device-meta">ลงทะเบียนแล้ว · 4 ภาพ</div></div></div>
+          <div class="device-row"><div class="face-avatar" style="width:38px;height:38px;">พ่อ</div><div class="device-info"><div class="device-name">คุณพ่อ — สมาชิกในบ้าน</div><div class="device-meta">ลงทะเบียนแล้ว · 5 ภาพ</div></div></div>
+          <div class="device-row"><div class="face-avatar" style="width:38px;height:38px;">ย่า</div><div class="device-info"><div class="device-name">คุณยาย — กลุ่มเปราะบาง</div><div class="device-meta">ลงทะเบียนแล้ว · 3 ภาพ</div></div></div>
+          <div style="margin-top:14px;"><button class="btn" style="width:100%;justify-content:center;">+ เพิ่มใบหน้าสมาชิกใหม่</button></div>
+ 
+          <div style="border-top:1px solid var(--border-soft);margin:18px 0 14px 0;"></div>
+          <div class="card-title" style="margin-bottom:10px;">สิทธิ์ผู้ใช้งาน</div>
+          <div class="settings-row"><div class="settings-label" style="font-size:13px;">คุณยาย — จำกัดการปรับตั้งค่า</div><div class="toggle on"></div></div>
+          <div class="settings-row"><div class="settings-label" style="font-size:13px;">น้องพลอย — จำกัดการเปิดไซเรน</div><div class="toggle on"></div></div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ================= 05 CLOUD/VIDEO ================= -->
+    <section class="view" id="view-cloud">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-head">
+          <div><div class="card-title">คลังบันทึกวิดีโอย้อนหลัง</div><div class="card-title-sub">เรียงตามช่วงเวลาที่มี Event Trigger</div></div>
+        </div>
+        <div class="grid grid-4">
+          <div class="video-thumb"><div class="camera-grid-lines"></div><span class="tagline">ภัยคุกคาม</span><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">00:42</span></div>
+          <div class="video-thumb"><div class="camera-grid-lines"></div><span class="tagline">คำเตือน</span><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">01:10</span></div>
+          <div class="video-thumb"><div class="camera-grid-lines"></div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">00:28</span></div>
+          <div class="video-thumb"><div class="camera-grid-lines"></div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">00:33</span></div>
+          <div class="video-thumb"><div class="camera-grid-lines"></div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">02:04</span></div>
+          <div class="video-thumb"><div class="camera-grid-lines"></div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">00:19</span></div>
+          <div class="video-thumb"><div class="camera-grid-lines"></div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">00:55</span></div>
+          <div class="video-thumb"><div class="camera-grid-lines"></div><div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></div><span class="duration">01:47</span></div>
+        </div>
+      </div>
+ 
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">การจัดการข้อมูลบน Cloud</div><div class="card-title-sub">สำรองข้อมูลอัตโนมัติ</div></div></div>
+          <div class="settings-row"><div><div class="settings-label">สำรองข้อมูลอัตโนมัติทุกคืน</div><div class="settings-sub">อัปโหลดคลิปที่มี Event Trigger เท่านั้น</div></div><div class="toggle on"></div></div>
+          <div class="settings-row"><div><div class="settings-label">เก็บบันทึกวิดีโอ</div><div class="settings-sub">ระยะเวลาการเก็บข้อมูลบนคลาวด์</div></div><span style="font-family:var(--font-mono);color:var(--teal);font-size:13px;">30 วัน</span></div>
+          <div style="margin-top:6px;">
+            <div class="card-title-sub" style="margin-bottom:4px;">พื้นที่จัดเก็บที่ใช้ไป</div>
+            <div class="storage-bar"><div class="storage-fill" style="width:64%;"></div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11.5px;color:var(--text-faint);font-family:var(--font-mono);"><span>64.2 GB ใช้ไปแล้ว</span><span>ทั้งหมด 100 GB</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">สรุปเหตุการณ์ 7 วันล่าสุด</div></div></div>
+          <svg viewBox="0 0 300 110" width="100%" height="110">
+            <polyline points="0,90 40,70 80,85 120,40 160,60 200,20 240,55 300,35" fill="none" stroke="#3ED6C0" stroke-width="2"/>
+            <polyline points="0,90 40,70 80,85 120,40 160,60 200,20 240,55 300,35 300,110 0,110" fill="rgba(62,214,192,0.08)" stroke="none"/>
+          </svg>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:4px;"><span>จ.</span><span>อ.</span><span>พ.</span><span>พฤ.</span><span>ศ.</span><span>ส.</span><span>อา.</span></div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ================= 06 SETTINGS ================= -->
+    <section class="view" id="view-settings">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">การตั้งค่าการแจ้งเตือน</div></div></div>
+          <div class="settings-row"><div><div class="settings-label">แจ้งเตือนผ่าน LINE Notify</div><div class="settings-sub">ส่งทุกเหตุการณ์ระดับภัยคุกคามและคำเตือน</div></div><div class="toggle on"></div></div>
+          <div class="settings-row"><div><div class="settings-label">แจ้งเตือนผ่านแอปพลิเคชัน</div><div class="settings-sub">Push notification บนมือถือ</div></div><div class="toggle on"></div></div>
+          <div class="settings-row"><div><div class="settings-label">เสียงแจ้งเตือนในแอป</div><div class="settings-sub">เปิดเสียงเมื่อมีเหตุการณ์ใหม่</div></div><div class="toggle"></div></div>
+          <div class="settings-row"><div><div class="settings-label">สรุปกิจกรรมประจำวัน</div><div class="settings-sub">ส่งสรุปทุกเย็นเวลา 20:00 น.</div></div><div class="toggle on"></div></div>
+        </div>
+ 
+        <div class="card">
+          <div class="card-head"><div><div class="card-title">ความปลอดภัยบัญชี</div></div></div>
+          <div class="settings-row"><div><div class="settings-label">ยืนยันตัวตนสองชั้น (2FA)</div><div class="settings-sub">สำหรับการเข้าใช้งานเว็บและแอปพลิเคชัน</div></div><div class="toggle on"></div></div>
+          <div class="settings-row"><div><div class="settings-label">แจ้งเตือนเมื่อมีการเข้าสู่ระบบใหม่</div><div class="settings-sub">อีเมลแจ้งเตือนอุปกรณ์ที่ไม่รู้จัก</div></div><div class="toggle on"></div></div>
+          <div style="margin-top:16px;"><button class="btn" style="width:100%;justify-content:center;">เปลี่ยนรหัสผ่าน</button></div>
+          <div style="margin-top:10px;"><button class="btn" style="width:100%;justify-content:center;">จัดการอุปกรณ์ที่เข้าสู่ระบบ</button></div>
+        </div>
+      </div>
+    </section>
+ 
+  </main>
+</div>
+ 
+<script>
+// ---------- login ----------
+const loginScreen = document.getElementById('login-screen');
+const appRoot = document.getElementById('app-root');
+const loginError = document.getElementById('login-error');
+const rememberBox = document.getElementById('remember-box');
+const emailField = document.getElementById('login-email');
+const pwField = document.getElementById('login-password');
+const submitBtn = document.getElementById('login-submit-btn');
+ 
+document.getElementById('remember-me').addEventListener('click', () => rememberBox.classList.toggle('on'));
+ 
+document.getElementById('toggle-eye').addEventListener('click', () => {
+  pwField.type = pwField.type === 'password' ? 'text' : 'password';
+});
+ 
+function attemptLogin(){
+  const email = emailField.value.trim();
+  const pw = pwField.value.trim();
+  if (!email || !pw) {
+    loginError.style.display = 'flex';
+    return;
+  }
+  loginError.style.display = 'none';
+  const originalHTML = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = 'กำลังตรวจสอบสิทธิ์...';
+  setTimeout(() => {
+    loginScreen.classList.add('hidden');
+    appRoot.classList.remove('hidden');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalHTML;
+  }, 650);
+}
+ 
+submitBtn.addEventListener('click', attemptLogin);
+[emailField, pwField].forEach(f => f.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') attemptLogin();
+}));
+ 
+// nav switching
+const navItems = document.querySelectorAll('.nav-item');
+const titles = {
+  dashboard: ['ภาพรวมระบบ','บ้านเลขที่ 24/8 — สถานะทั้งหมดของบ้านในที่เดียว'],
+  alerts: ['แจ้งเตือน & ตอบโต้','ติดตามและตอบสนองต่อเหตุการณ์ผิดปกติแบบเรียลไทม์'],
+  devices: ['อุปกรณ์ & เซนเซอร์','จัดการกล้อง AI CCTV และเซนเซอร์ทุกจุดในบ้าน'],
+  access: ['สมาชิก & การเข้า-ออก','บันทึกการเข้าออกและคลังใบหน้าสำหรับ AI'],
+  cloud: ['บันทึกย้อนหลัง & คลาวด์','เรียกดูวิดีโอและจัดการพื้นที่จัดเก็บข้อมูล'],
+  settings: ['ตั้งค่าระบบ','การแจ้งเตือนและความปลอดภัยของบัญชี']
+};
+function switchView(name){
+  navItems.forEach(n => n.classList.toggle('active', n.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  document.getElementById('page-title').textContent = titles[name][0];
+  document.getElementById('page-sub').textContent = titles[name][1];
+}
+navItems.forEach(item => item.addEventListener('click', () => switchView(item.dataset.view)));
+ 
+// lock toggle
+const lockBtn = document.getElementById('lock-btn');
+const lockStatus = document.getElementById('lock-status');
+let locked = true;
+lockBtn.addEventListener('click', () => {
+  locked = !locked;
+  lockStatus.textContent = locked ? 'ล็อกอยู่' : 'ปลดล็อกแล้ว';
+  lockBtn.innerHTML = (locked
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> ปลดล็อกประตู'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 4.7-3.9"/></svg> ล็อกประตู');
+});
+ 
+// siren buttons
+[document.getElementById('siren-btn'), document.getElementById('siren-btn-2')].forEach(btn=>{
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active-toggle');
+    btn.style.animation = btn.classList.contains('active-toggle') ? 'pulse-dot 0.6s infinite' : 'none';
+  });
+});
+ 
+// toggles
+document.querySelectorAll('.toggle').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
+ 
+// clock
+function tick(){
+  const now = new Date();
+  const time = now.toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const date = now.toLocaleDateString('th-TH', {day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('clock-time').textContent = time;
+  document.getElementById('clock-date').textContent = date;
+  const camClock = document.getElementById('cam-clock');
+  if(camClock) camClock.textContent = time;
+}
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
