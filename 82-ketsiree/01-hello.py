@@ -1,2 +1,2 @@
-print("ketsiree")
-print("Hello World")
+print("เกศสิรีย์ แสงกันยา")
+print("Name, " + ชั้นปวช.2ทด.1 + "!")
