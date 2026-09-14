@@ -1,9 +1,13 @@
-
-score = 75
+score =float(input("กรุณากรอกคะเเนนของนักเรียน:"))
 
 if score >= 80:
-    print("เกรด A")
-elif score >= 70:
-    print("เกรด B")
+    grade ="A"
+elif score >=70:
+    grade ="B"
+elif score >=60:
+    grade ="C"
+elif score >=50:
+    grade ="D"
 else:
-    print("เกรด C")
+    grade ="A"
+print(f"คะเเนนที่คุณได้{score} เกรดที่คุณได้{grade}")
