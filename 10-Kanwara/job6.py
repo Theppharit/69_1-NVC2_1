@@ -1,4 +1,4 @@
-num = 6
+num = 8
 i = 1
 
 while i <= 12:
