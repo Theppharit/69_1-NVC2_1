@@ -19,3 +19,6 @@ print(f"สินค้า: {product_name1} | ราคาต่อชิ้น:
 print(f"สินค้า: {product_name2} | ราคาต่อชิ้น: {unit_price2} บาท | จำนวนที่ขาย: {quantity_sold2} ชิ้น | ยอดขาย: {total_sales2} บาท")
 print("-----------------------------")
 print(f"ยอดขายรวมทั้งหมด: {grand_total} บาท")
+
+
+      
