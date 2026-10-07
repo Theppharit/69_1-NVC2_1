@@ -10,4 +10,4 @@ elif score>=50:
     grade="D"
 else:
     grade="F"
-print(F"คะเเนนที่คุณได้{score}เกรดที่คุณได้{grade}")
+print(F"คะเเนนที่คุณได้{score}เกรดที่คุณได้{grade}") 
