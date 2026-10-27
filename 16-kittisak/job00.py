@@ -1,5 +1,5 @@
 
-student_name = "ศุภสิน รื่นนุสาร"
+student_name = "กิตติศักดิ์ จีนกลาง"
 print("=== โปรแกรมโดย:", student_name, "===")
 
 product_list = []
