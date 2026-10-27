@@ -1,12 +1,6 @@
-student = ["กาย",
-           "ฟิลม์",
-           ":รุ้ง", 
-           "ทศ", 
-           "เกรซ",
-]
+students = ["จิราพรรฯ", "ศุภสิน", "กิตติศักดิ์", "ธัญพิสิษฐ์", "สมบัษร",]
 
-
-for i in range(len(student)):
-    print(F"ลำดับที่ {i+1} {student[i]}")
+for i, s in enumerate(students, start=1):
+    print("ลำดับที่", i, s)
 
     
