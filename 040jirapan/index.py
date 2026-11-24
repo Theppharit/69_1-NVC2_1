@@ -1,5 +1,5 @@
 from flask import Flask, render_template_string, abort
-app = Flask(_name)
+app = Flask(__name__)
 
 
 
