@@ -1,5 +1,5 @@
-from flask import Flast, render_template_straing, abourt
-app = Flast (__name__)
+from flask import Flask, render_template_straing, abourt
+app = Flask(__name__)
 
 PAGE = """
 
