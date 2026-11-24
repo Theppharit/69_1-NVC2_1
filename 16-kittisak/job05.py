@@ -4,4 +4,4 @@ def info(**detail) :
     print("อายุ" ,detail["room"])
     print("โทรมา" ,detail)
     print("อีเมล" ,detail)
-info(name = "บิ๊ก" , room = "นานาชาติ")
+info(name = "บิ๊ก" , room = "นานาชาติ")CX
