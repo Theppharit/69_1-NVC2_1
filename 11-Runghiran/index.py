@@ -15,8 +15,8 @@ PAGE = """
 </html>
 
 """
-@app.route ("/")
+@app.route("/")
 def index():
-    return render_template_string (PAGE)
-if __name__ =="__Main__":
-    app.run (debug = True)
+    return render_template_string(PAGE)
+if __name__ =="__main__":
+    app.run(debug = True)
