@@ -1,14 +1,10 @@
-# รับราคาสินค้าและอัตราภาษี VAT จากผู้ใช้[span_1](start_span)[span_1](end_span)
-price = float(input("ป้อนราคาสินค้า: "))
-vat_rate = float(input("ป้อนอัตราภาษี VAT (เป็นเปอร์เซ็นต์ เช่น 7): "))
+def info(**details):
+    print("สวัสดี คุณ" , details["name"])
+    print("ยินดีต้อนรับสู่" , details["room"])
+    print("คุณอายุ" , details["age"] , "ปี")
+    print("คุณมีน้ำหนัก" , details["weight"] , "กิโลกรัม")
+    print("คุณสูง" , details["height"] , "เซนติเมตร")
+    print("คุณมีเพศ" , details["gender"])
+    print("ขอบคุณที่ใช้บริการของเรา")
 
-# คำนวณภาษี VAT และราคารวมสุทธิ (ราคารวมภาษี VAT)[span_2](start_span)[span_2](end_span)
-vat_amount = price * (vat_rate / 100)
-total_price = price + vat_amount
-
-# แสดงผลลัพธ์ออกทางหน้าจอ[span_3](start_span)[span_3](end_span)
-print("-" * 30)
-print(f"ราคาสินค้าตั้งต้น: {price:.2f} บาท")
-print(f"มูลค่าภาษี VAT ({vat_rate}%): {vat_amount:.2f} บาท")
-print(f"ราคารวมสุทธิ (ราคารวมภาษี): {total_price:.2f} บาท")
-print("-" * 30)
+info(name="ฟิล์ม", room="ห้อง 1", age=20, weight=70, height=180, gender="ชาย")
