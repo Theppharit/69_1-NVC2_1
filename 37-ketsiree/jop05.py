@@ -5,4 +5,5 @@ def info(**detail) :
     print("อีเมล", detail["email"])
     print("ส่วนสูง", detail["height"])
 
-info(name="มิ้น", room= "คอมพิวเตอร์", age=16, email="ketsiree.1604@gmail.com", height= "158",
+
+info(name="มิ้น", room= "คอมพิวเตอร์", age=16, email="ketsiree.1604@gmail.com", height= "158")
