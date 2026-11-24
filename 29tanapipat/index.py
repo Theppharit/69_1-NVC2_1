@@ -1,7 +1,7 @@
-from flask import flask, render_templeat_string , abort
-app = flask (__name__)
+from flask import Flask, render_template_string, abort
+app = Flask(__name__)
 
-PAGE =""""
+PAGE ="""
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,8 +15,8 @@ PAGE =""""
 """
 
 
-@ app .ronte ("/")
-def index ():
-    return render_templeat_string (PAGE)
-if __name__ == "__Main__":
-    app.run (debug = True)
+@app.route("/")
+def index():
+    return render_template_string(PAGE)
+if __name__ == "__main__":
+    app.run(debug = True)
