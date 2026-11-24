@@ -1,5 +1,5 @@
 from flask import Flask, render_template_string, abort
-app = flask(__name__)
+app = Flask(__name__)
             
 PAGE = """
 
@@ -19,7 +19,7 @@ PAGE = """
 
 @app.route("/")
 def index():
-    render_template_string(PAGE)
+    return render_template_string(PAGE)
                            
 if __name__=="__main__"  :
     app.run(debug=True)                         
