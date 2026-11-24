@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string,abort
+from flask import Flask, render_template_string, abort
 app = Flask(__name__)
 
 PAGE = """
@@ -21,5 +21,5 @@ PAGE = """
 def index():
     return render_template_string(PAGE)
 
-if__name__=="__main__":
-    app.run(debug=True,host="0.0.0.0")
+if__name__ == "__main__":
+    app.run(debug=True)
