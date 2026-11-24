@@ -1,19 +1,17 @@
-def Products(name, price):
-    # คำนวณ กัส
-    vat = price * 0.07
-    # ศูภสิน
-    total_price = price + vat
-    
-    print(f"--- รายละเอียดสินค้า: {name} ---")
-    print(f"ราคาสินค้า: {price:.2f} บาท")
-    print(f"ภาษี VAT 7%: {vat:.2f} บาท")
-    print(f"ราคารวมภาษี (สุทธิ): {total_price:.2f} บาท\n")
+# รายการที่ 1
+name1 = input("กรอกชื่อสินค้าที่ 1 : ")
+price1 = float(input("ราคา : "))
+qty1 = int(input("จำนวน : "))
+total1 = price1 * qty1
 
-# รับข้อมูล กัส
-for i in range(1, 6):
-    print(f"กรุณากรอกข้อมูลสินค้าชิ้นที่ {i}")
-    product_name = input("ชื่อสินค้า: ")
-    product_price = float(input("ราคาสินค้า: "))
-    
-    # เรียกใช้ บังกัส
-    Products(product_name, product_price)
+# รายการที่ 2
+name2 = input("กรอกชื่อสินค้าที่ 2 : ")
+price2 = float(input("ราคา : "))
+qty2 = int(input("จำนวน : "))
+total2 = price2 * qty2
+
+# แสดงผล
+print("\n=== สรุปรายการขาย ===")
+print("สินค้า 1:", name1, "| ราคา:", price1, "| จำนวน:", qty1, "| ยอดรวม:", total1)
+print("สินค้า 2:", name2, "| ราคา:", price2, "| จำนวน:", qty2, "| ยอดรวม:", total2)
+print("ยอดรวมทั้งหมด:", total1 + total2, "บาท")
