@@ -1,5 +1,6 @@
-from flask import flask,render_template_string,abort
-app =flask(__name__)
+from flask import Flask, render_template_string, abort
+
+app = Flask(__name__)
 
 
 
@@ -22,9 +23,9 @@ PAGE = """
 
 """
 
-@app.route("/")
-def index():
-    return render_template_string(PAGE)
+@app.route('/')
+def home():
+    return render_template_string("<h1>Hello World!</h1>")
 
-if __name__ == "__main__":
-  app.run(debug=True) 
+if __name__ == '__main__':
+    app.run(debug=True)
