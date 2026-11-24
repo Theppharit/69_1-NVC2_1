@@ -16,7 +16,7 @@ PAGE = """
     <title>Document</title>
 </head>
 <body>
-    <h1>สวัสดีทุกๆ เราชื่อ ณิชานันท์ จันทรศิริ 68219100004</h1>
+    <h1> สวัสดีทุกๆ เราชื่อ ณิชานันท์ จันทรศิริ 68219100004 </h1>
     
 </body>
 </html>
@@ -25,7 +25,7 @@ PAGE = """
 
 @app.route('/')
 def home():
-    return render_template_string("<h1>Hello World!</h1>")
+    return render_template_string(PAGE)
 
 if __name__ == '__main__':
     app.run(debug=True)
