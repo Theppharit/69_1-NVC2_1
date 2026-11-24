@@ -1,0 +1,25 @@
+from flask import Flask, render_template_string,abort
+app = Flask(__name__)
+
+PAGE = """
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>นางสาว ธัญชนก มังจันทึก 68219100032</h1>
+</body>
+</html>
+
+"""
+
+@app.route("/")
+def index():
+    return render_template_string(PAGE)
+
+if__name__=="__main__":
+    app.run(debug=True,host="0.0.0.0")
