@@ -22,7 +22,7 @@ PAGE = """
 """
 @app.route("/")
 def index():
- return render_template_straing(PAGE)
+ return render_template_string(PAGE)
 
 if __name__ == "__main__":
      app.run(debug=True)
