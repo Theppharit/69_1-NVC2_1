@@ -1,7 +1,7 @@
 from flask import Flask, render_template_string, abort
 app = Flask(__name__)
 
-PANG = """
+PAGE = """
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,9 +17,9 @@ PANG = """
 
 """
 
-@APP.ROUTE("/")
+@app.route("/")
 def index():
-    return render_template_sting(PANG)
+    return render_template_string(PAGE)
 
 if __name__ == "__main__":
     app.run(debug=True)
