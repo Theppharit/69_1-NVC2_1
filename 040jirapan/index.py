@@ -26,4 +26,4 @@ def index():
     return render_template_string(PAGE)
 
 if __name__=="__main__":
-    app.run(dobug=True)
+    app.run(debug=True)
